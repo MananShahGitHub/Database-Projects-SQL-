@@ -1,0 +1,168 @@
+-- COMMENTS README:
+-- 1. In order to execute a query, uncomment the code to run it.
+-- 2. Comments are used to explain the purpose and logic of the code.
+-- 3. Additional code for testing functionality is also included with explanations.
+
+-- Drop the tables if they exist to avoid errors when creating tables again.
+DROP TABLE IF EXISTS employees;
+DROP TABLE IF EXISTS departments;
+
+-- Create the employees table.
+CREATE TABLE employees (
+    employee_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    department_id INT,
+    hire_date DATE,
+    salary DECIMAL(10, 2)
+);
+
+-- Insert sample data into employees table.
+-- Note: Added 2 extra employee records to test Task 4.1.
+INSERT INTO employees VALUES
+(1, 'John', 'Doe', 1, '2015-01-15', 60000),
+(2, 'Jane', 'Smith', 2, '2016-03-22', 75000),
+(3, 'Alice', 'Johnson', 1, '2017-05-18', 85000),
+(4, 'Bob', 'Lee', 3, '2018-07-11', 55000);
+-- Additional sample data for testing:
+-- (5, 'Cameron', 'Lee', 3, '2018-07-11', 105000),
+-- (6, 'Tyler', 'Lee', 2, '2018-07-11', 135000);
+
+-- Create the departments table.
+CREATE TABLE departments (
+    department_id INT PRIMARY KEY,
+    department_name VARCHAR(50)
+);
+
+-- Insert sample data into departments table.
+INSERT INTO departments VALUES
+(1, 'Engineering'),
+(2, 'Marketing'),
+(3, 'Sales');
+
+-- Task 2.1: Retrieve all employees who were hired after January 1, 2016.
+-- Assumption: Hire date is considered inclusive from January 1, 2016.
+-- Uncomment to execute the query.
+
+SELECT * FROM employees
+WHERE hire_date > '2016-01-01';
+
+-- Task 2.2: Retrieve the full names of employees and their corresponding department names.
+-- Join employees table with departments table on department_id.
+-- Uncomment to execute the query.
+/*
+SELECT CONCAT(e.first_name, ' ', e.last_name) AS full_name, d.department_name
+FROM employees e
+JOIN departments d ON e.department_id = d.department_id;
+*/
+
+-- Task 2.3: Calculate the average salary of employees in each department.
+-- Group employees by department_id and calculate average salary.
+-- Uncomment to execute the query.
+/*
+SELECT d.department_name, AVG(e.salary) AS average_salary
+FROM employees e
+JOIN departments d ON e.department_id = d.department_id
+GROUP BY d.department_name;
+*/
+
+-- Task 3.1: Give a 10% raise to all employees in the Marketing department.
+-- Note: RETURNING clause is used to show the updated records.
+-- marketing department has a department_id of 2 
+-- Uncomment to execute the query.
+/*
+UPDATE employees
+SET salary = salary * 1.10
+WHERE department_id = 2
+RETURNING *;
+*/
+
+-- Task 3.2: Delete employees who were hired before January 1, 2016.
+-- Note: RETURNING clause is used to show the deleted records.
+-- Uncomment to execute the query.
+/*
+DELETE FROM employees
+WHERE hire_date < '2016-01-01'
+RETURNING *;
+*/
+
+-- Task 4.1: Find the department with the highest average salary.
+-- Use subquery to order departments by average salary and limit to the top result.
+-- Uncomment to execute the query.
+/*
+SELECT department_name
+FROM (
+    SELECT d.department_name, AVG(e.salary) AS average_salary
+    FROM employees e
+    JOIN departments d ON e.department_id = d.department_id
+    GROUP BY d.department_name
+    ORDER BY average_salary DESC
+    LIMIT 1
+) AS subquery;
+*/
+
+-- Task 4.2: List employees who have a salary above the average salary of their department.
+-- Use subquery to compare employee salary with department average salary.
+-- Uncomment to execute the query.
+/*
+SELECT e.first_name, e.last_name, e.salary, d.department_name
+FROM employees e
+JOIN departments d ON e.department_id = d.department_id
+WHERE e.salary > (
+    SELECT AVG(salary)
+    FROM employees
+    WHERE department_id = e.department_id
+);
+*/
+
+-- Task 5 (Optional): Programming Integration using Python
+-- This code is provided to copy and paste into a Python environment. Run this script in an IDE like PyCharm or VSCode.
+-- Note: Install psycopg2 using `pip install psycopg2` before running the script.
+ /*
+ import psycopg2
+
+ try:
+     # Connect to your PostgreSQL database
+     conn = psycopg2.connect(
+         dbname="Custody Operations at Gemini",
+         user="mananshah7",
+         password="your_password",  # replace with your actual password
+         host="localhost"
+     )
+    
+     # Create a cursor object
+     cur = conn.cursor()
+
+     # Execute a query
+     cur.execute("SELECT * FROM employees;")
+
+     # Fetch all results
+     employees = cur.fetchall()
+
+     # Print the results in a readable format
+     for emp in employees:
+         print(f"Employee ID: {emp[0]}, Name: {emp[1]} {emp[2]}, Department ID: {emp[3]}, Hire Date: {emp[4]}, Salary: {emp[5]}")
+
+     # Close the cursor and connection
+     cur.close()
+     conn.close()
+
+ except Exception as e:
+     print(f"An error occurred: {e}")
+ */
+
+-- Additional Queries for Visualization
+-- This query helps visualize all employee details including department names and salaries.
+-- Uncomment to execute the query.
+/*
+SELECT 
+    e.employee_id,
+    e.first_name,
+    e.last_name,
+    e.hire_date,
+    e.salary,
+    d.department_name,
+	d.department_id
+FROM employees e
+JOIN departments d ON e.department_id = d.department_id;
+*/
